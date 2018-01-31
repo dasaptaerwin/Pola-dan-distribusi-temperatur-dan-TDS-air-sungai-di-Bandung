@@ -1,5 +1,7 @@
 untitled.html
 ha0nnugpbmo.html
+figures/aditya1-1
+b6qddjkjoho.html
 98qhlj32h5c.html
 mic32ng0scs.html
 22mhk0g8doo.html
