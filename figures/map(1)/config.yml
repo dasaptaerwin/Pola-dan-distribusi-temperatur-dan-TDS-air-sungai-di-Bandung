@@ -8,7 +8,7 @@ grid:
   rows: 1
   columns: 1
   grid_elements:
-  - path: figures/map(1)/map(1).png
+  - path: figures/map(1)/adit_maps.png
     type: static
     from:
     - 1
@@ -16,4 +16,5 @@ grid:
     to:
     - 1
     - 1
-    url: "/users/87737/articles/283731/master/file/figures/map(1)/map(1).png"
+    folder_url: "/users/87737/articles/283731/master/folder/figures/map(1)"
+    url: "/users/87737/articles/283731/master/file/figures/map(1)/adit_maps.png"
