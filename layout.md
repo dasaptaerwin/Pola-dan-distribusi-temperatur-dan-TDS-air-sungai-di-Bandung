@@ -4,7 +4,6 @@ ha0nnugpbmo.html
 figures/aditya1-1
 98qhlj32h5c.html
 mic32ng0scs.html
-22mhk0g8doo.html
 figures/map(1)
 e42u1a5vbus.html
 btp66sf86g.html
