@@ -1,2 +1,2 @@
 # Pola-dan-distribusi-temperatur-dan-TDS-air-sungai-di-Bandung
-Dokumen ini live document merupakan tesis Program Magister Teknik Air Tanah, Fakultas Ilmu dan Teknologi Kebumian, Institut Teknologi Bandung atas nama Saudara Sri Aditya dibawah bimbingan saya. 
+Folder proyek ini merupakan repositori untuk riset program magister atas nama Sri Aditya, Prodi Magister Teknik Air Tanah, Fakultas Ilmu dan Teknologi Kebumian, Institut Teknologi Bandung. Repositori ini akan dibuka untuk umum setelah tesis lolos proses sidang magister (embargo period). Repositori data ini terkait dengan proyek penulisan tesis terbuka di Authorea http://bit.ly/tesisAditya. Secara terintegrasi via menu `Add-ons`, repositori ini terkait dengan akun Google Drive, GitHub dan Figshare.
