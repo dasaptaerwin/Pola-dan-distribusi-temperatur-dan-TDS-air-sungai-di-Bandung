@@ -1,5 +1,4 @@
 abstract.html
-ru4misqoh4k.html
 untitled.html
 ha0nnugpbmo.html
 figures/aditya1-1
