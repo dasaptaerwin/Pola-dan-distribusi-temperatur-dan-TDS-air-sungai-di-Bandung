@@ -15,6 +15,8 @@ qqshqlv857o.html
 1ng39cpfehg.html
 p284eh1r5uk.html
 ukm0jct8v68.html
+figures/measured_variables - Sheet1
+8v1m1f11k3g.html
 jes1npag7gs.html
 hu9pnhagah4.html
 g0l06es5a98.html
