@@ -1,8 +1,6 @@
 abstract.html
 ru4misqoh4k.html
 8s7ba2b43ms.html
-pt5023vm8rs.html
-a5p9o47jo6g.html
 untitled.html
 ha0nnugpbmo.html
 figures/aditya1-1
