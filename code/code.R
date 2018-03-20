@@ -15,7 +15,7 @@ isntall.packages('tidyverse') # for data manipulation and visualization
 install.packages('forecast')  # for forecast and time series analysis
 install.packages('tseries')   # for time series analysis
 install.packages('gridExtra') # for panel/facet plotting
-install.packages('ggfortify')
+#install.packages('ggfortify')
 
 
 # LOAD LIBRARY (LOAD EVERYTIME YOU OPEN THIS CODE)
@@ -28,6 +28,9 @@ library('ggfortify')
 
 # LOAD DATA (REFORMAT YOUR DATA INTO TABULAR FORMAT)
 data<-read.csv('data.csv')
+data_cp<-read.csv('data_cp.csv')
+data_phi<-read.csv('data_phi.csv')
+data_grp<-read.csv('data_grp.csv')
 
 # CURUG PANGANTEN DATA
 
@@ -36,8 +39,13 @@ data<-read.csv('data.csv')
 data$combine <- as.POSIXct(paste(data$DATE, data$TIME_WIB), format="%Y-%m-%d %H:%M") # combining date and time into a column
 data$combine
 
-data$ts.tds <- ts(data$TDS_PPM) # converting number to time series class
-class(data$ts.tds)  # checking time series class
+data$ts_tds_cp <- ts(data$TDS_PPM) # converting 
+#number to time series class
+data$ts_tds_phi <- ts(data_phi$TDS_PPM) # converting 
+data$ts_tds_grp <- ts(data_grp$TDS_PPM) # converting 
+
+
+class(data$ts_tds_cp)  # checking time series class
 data$ts.tempriver <- ts(data$TEMP_RIVER_C)
 class(data$ts.tempriver)
 data$ts.tempair <- ts(data$TEMP_AIR_C)
@@ -139,55 +147,70 @@ plot(decompose_tds_add)
 
 dev.off()
 
+decompose_tds_add$seasona <- tsclean(decompose_tds_add$seasona)
+decompose_tds_add$trend <- tsclean(decompose_tds_add$trend)
+decompose_tds_add$random <- tsclean(decompose_tds_add$random)
+
 p1 <- ggplot(data=data, aes(x = data$combine)) +
-  geom_line(aes(y = data$ts.tds))
+  geom_line(aes(y = data$ts.tds))+
+  xlab('month') + ylab('seasonal')
 
 p2 <- ggplot(data=data, aes(x = data$combine)) +
-  geom_line(aes(y = decompose_tds_add$seasonal))
+  geom_line(aes(y = decompose_tds_add$seasonal))+
+  xlab('month') + ylab('tds data')
             
 p3 <- ggplot(data=data, aes(x = data$combine)) +
-  geom_line(aes(y = decompose_tds_add$trend))
+  geom_line(aes(y = decompose_tds_add$trend))+
+  xlab('month') + ylab('trend')
 
 p4 <- ggplot(data=data, aes(x = data$combine)) +
-  geom_line(aes(y = decompose_tds_add$random))
+  geom_line(aes(y = decompose_tds_add$random))+
+  xlab('month') + ylab('random/noise')
 
 grid.arrange(p1,p2,p3,p4,ncol=1)
 
-## ON TDS USING DECOMPOSE FUNCTION MULTIPLICATIVE
+## ON TDS USING DECOMPOSE FUNCTION MULTIPLICATIVE OK
 decompose_tds_mult <- decompose(tds_ma, "mult")
+decompose_tds_add <- decompose(tds_ma, "additive")
 plot(as.ts(decompose_tds_mult$seasonal))
 plot(as.ts(decompose_tds_mult$trend))
+
+### evaluating multiplicative vs additive OK
+par(mfrow=c(2,1))
 plot(as.ts(decompose_tds_mult$random))
-plot(decompose_tds_mult)
+plot(as.ts(decompose_tds_add$random))
 
-
-## results: we don't see any difference between decompose additive vs multiplicative
+## results: we don't see any difference between decompose additive vs multiplicative OK
 
 tds_ma <- ts(na.omit(data$tdsma30), frequency=30)
 decomp <- stl(tds_ma, s.window="periodic")
 deseasonal <- seasadj(decomp)
 plot(decomp)
 
-## TEMPRIVER
+## TEMPRIVER (tidak digunakan pasti seasonal)
+### orde 100
 tempriver_ma <- ts(na.omit(data$tempriverma7), frequency=100) #OK
 decomp_tempriver <- stl(tempriver_ma, s.window="periodic")
-deseasonal <- seasadj(decomp)
-plot(decomp)
+deseasonal <- seasadj(decomp_tempriver)
+plot(decomp_tempriver)
 
+# orde 30
 tempriver_ma <- ts(na.omit(data$tempriverma30), frequency=30)
-decomp <- stl(tempriver_ma, s.window="periodic")
-deseasonal <- seasadj(decomp)
-plot(decomp)
+decomp_tempriver30 <- stl(tempriver_ma, s.window="periodic")
+deseasonal <- seasadj(decomp_tempriver30)
+plot(decomp_tempriver30)
 
 ## TEMPAIR
+### orde 100
 tempair_ma <- ts(na.omit(data$tempairma7), frequency=100)
 decomp_tempair <- stl(tempair_ma, s.window="periodic")
-deseasonal <- seasadj(decomp)
-plot(decomp)
+deseasonal <- seasadj(decomp_tempair)
+plot(decomp_tempair)
 
+### orde 30
 tempair_ma <- ts(na.omit(data$tempairma30), frequency=30)
-decomp <- stl(tempair_ma, s.window="periodic")
-deseasonal <- seasadj(decomp)
+decomp_tempair30 <- stl(tempair_ma, s.window="periodic")
+deseasonal <- seasadj(decomp_tempair30)
 plot(decomp)
 
 # CORRELATIONS
@@ -196,7 +219,7 @@ ts.plot(data$tdsma7)
 ts.plot(data$tdsma30)
 ts.plot(data$ts.tds, data$tdsma7, data$tdsma30, col=c("green", "blue", "red"))
 ts.plot(data$ts.tds, data$ts.tempriver, col=c("green", "blue"))
-
+dev.off()
 
 dev.off()
 par(mar = c(5, 5, 3, 5))
