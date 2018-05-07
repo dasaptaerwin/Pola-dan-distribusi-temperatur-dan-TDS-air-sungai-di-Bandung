@@ -4,17 +4,17 @@
 <<<<<<< HEAD
 # Written to analyse time series data from Cikapundung River (taken by Sri Aditya)
 =======
->>>>>>> 301e40f633e42a9f729bda64e0f1835f8e0d8700
+  >>>>>>> 301e40f633e42a9f729bda64e0f1835f8e0d8700
 
 
 # README: data time series ini diukur di tiga lokasi, pada masing-masing lokasi pengukuran dilakukan 4 kali sehari, dua kali seminggu, selama 8 bulan di tahun 2017.
 
 # INSTALL LIBRARY (DO THIS ONCE)
 install.packages('lubridate') # for date manipulation
-isntall.packages('tidyverse') # for data manipulation and visualization
-install.packages('forecast')  # for forecast and time series analysis
+install.packages('tidyverse') # for data manipulation and visualization
 install.packages('tseries')   # for time series analysis
 install.packages('gridExtra') # for panel/facet plotting
+install.packages('forecast')
 #install.packages('ggfortify')
 
 
@@ -34,158 +34,187 @@ data_grp<-read.csv('data_grp.csv')
 
 # CURUG PANGANTEN DATA
 
-### TDS ###
-# CONVERT TO TIME SERIES OBJECT OK
-data$combine <- as.POSIXct(paste(data$DATE, data$TIME_WIB), format="%Y-%m-%d %H:%M") # combining date and time into a column
+### TDS ###  -- OK
+
+# CONVERT TO TIME SERIES OBJECT -- OK
+
+## convert date and time as time series then put them in one column
+data$combine <- as.POSIXct(paste(data$DATE, data$TIME_WIB), format="%Y-%m-%d %H:%M") 
 data$combine
 
-data$ts_tds_cp <- ts(data$TDS_PPM) # converting 
+## convert tds data as time series object
+data_cp$ts_tds <- ts(data_cp$TDS_PPM) # converting 
 #number to time series class
-data$ts_tds_phi <- ts(data_phi$TDS_PPM) # converting 
-data$ts_tds_grp <- ts(data_grp$TDS_PPM) # converting 
+data_phi$ts_tds <- ts(data_phi$TDS_PPM) # converting 
+data_grp$ts_tds <- ts(data_grp$TDS_PPM) # converting 
+class(data_cp$ts_tds)  # checking time series class
 
 
-class(data$ts_tds_cp)  # checking time series class
-data$ts.tempriver <- ts(data$TEMP_RIVER_C)
-class(data$ts.tempriver)
-data$ts.tempair <- ts(data$TEMP_AIR_C)
-class(data$ts.tempair)
+## convert temp river and temp air data as time series object
+data_cp$ts.tempriver <- ts(data_cp$TEMP_RIVER_C)
+data_cp$ts.tempair <- ts(data_cp$TEMP_AIR_C)
+data_phi$ts.tempriver <- ts(data_phi$TEMP_RIVER_C)
+data_phi$ts.tempair <- ts(data_phi$TEMP_AIR_C)
+data_grp$ts.tempriver <- ts(data_grp$TEMP_RIVER_C)
+data_grp$ts.tempair <- ts(data_grp$TEMP_AIR_C)
 
-## plot histogram OK
-ggplot(data=data, aes(data$TEMP_AIR_C)) +
+## plot histogram -- OK
+ggplot(data=data_cp, aes(TEMP_AIR_C)) +
   geom_histogram(fill="blue") +
-  geom_histogram(aes(data$TEMP_RIVER_C), fill="red") +
+  geom_histogram(aes(TEMP_RIVER_C), fill="red") +
   labs(title = "Histogram temperatur udara (biru) vs air sungai (merah) Curug Panganten, Bandung",
        subtitle = "Maret-November 2017",
        x = "Temperatur (oC)")
 
-## plot histogram TDS ts OK
-ggplot(data=data, aes(data$TDS_PPM)) +
+## plot histogram TDS ts -- OK
+ggplot(data=data_cp, aes(TDS_PPM)) +
   geom_histogram(fill="blue") +
   labs(title = "Histogram TDS Air Sungai Curug Panganten, Bandung",
        subtitle = "Maret-November 2017",
        x = "TDS (ppm)")
 
-## plot histogram temp river vs air OK
-plot(data$ts.tempriver)
-ggplot(data=data, aes(x = data$combine)) +
-  geom_line(aes(y = data$ts.tempriver), col="red") +
-  geom_line(aes(y = data$ts.tempair), col="blue") +
+## plot histogram temp river vs air -- OK
+ggplot(data=data_cp, aes(x = data$combine)) +
+  geom_line(aes(y = ts.tempriver), col="red") +
+  geom_line(aes(y = ts.tempair), col="blue") +
   labs(title = "Temp air sungai dan temp udara Curug Panganten, Bandung",
        subtitle = "Maret-November 2017",
        x = "Bulan", y = "Temperatur (derajat C)") + theme(legend.position="bottom")
 
-## plot temp air vs river ts OK
-ggplot(data=data, aes(x = data$TEMP_RIVER_C, y=data$TEMP_AIR_C)) +
+## plot temp air vs river ts -- OK
+ggplot(data=data_cp, aes(x = ts.tempriver, y= ts.tempair)) +
   geom_point() +
   labs(title = "Temp air sungai vs temp udara Curug Panganten, Bandung",
        subtitle = "Maret-November 2017",
        x = "Temperatur Air Sungai (oC)", y = "Temperatur Udara (oC)") 
 
+## plot TDS as is
+
+dev.off()
+par(mfrow=c(3,1))
+
+plot.ts(data_cp$TDS_PPM)
+title(main="Plot TDS (ppm) Maret - November 2017 di lokasi CP", col.main="blue", font.main=4)
+
+plot.ts(data_phi$TDS_PPM)
+title(main="Plot TDS (ppm) Maret - November 2017 di lokasi PHI", col.main="blue", font.main=4)
+
+plot.ts(data_grp$TDS_PPM)
+title(main="Plot TDS (ppm) Maret - November 2017 di lokasi GRP", 
+      col.main="blue")
+
+plot.ts(data_grp$TDS_PPM, col='grey', ylim=c(60, 150))
+lines(data_cp$TDS_PPM, col='red')
+lines(data_phi$TDS_PPM, col='blue')
+
 ## plot TDS ts OK
-ggplot(data=data, aes(x = data$combine, y = data$ts.tds)) + geom_line() +
+ggplot(data=data_cp, aes(x = data$combine, y = ts_tds)) + geom_line() +
   labs(title = "Plot TDS air sungai Curug Panganten, Bandung",
        subtitle = "Maret-November 2017",
        x = "Bulan", y = "TDS (ppm)")
 
+
+ggplot(data=data_phi, aes(x = data$combine, y = ts_tds)) + geom_line() +
+  labs(title = "Plot TDS air sungai PHI, Bandung",
+       subtitle = "Maret-November 2017",
+       x = "Bulan", y = "TDS (ppm)")
+
+ggplot(data=data_grp, aes(x = data$combine, y = ts_tds)) + geom_line() +
+  labs(title = "Plot TDS air sungai GRP, Bandung",
+       subtitle = "Maret-November 2017",
+       x = "Bulan", y = "TDS (ppm)")
+
+################## objects need to be adjusted ###############
+
 # MOVING AVERAGE (MA)
-data$tdsma7 <- ma(data$ts.tds, order=7)   # orde mingguan (7 hari)
-data$tdsma30 <- ma(data$ts.tds, order=30) # orde bulanan (30 hari)
-data$tdsma100 <- ma(data$ts.tds, order=100) # orde bulanan (100 hari)
-data$tempriverma7 <- ma(data$ts.tempriver, order=7)
-data$tempriverma30 <- ma(data$ts.tempriver, order=30)
-data$tempairma7 <- ma(data$ts.tempair, order=7)
-data$tempairma30 <- ma(data$ts.tempair, order=30)
+ma_cp <- ma(data_cp$ts_tds, order=100) 
+ma_phi <- ma(data_phi$ts_tds, order=100) ma_grp <- ma(data_grp$ts_tds, order=100) 
 
-# CLEAN MISSING VALUES IN MA RESULTS
-data$tdsma7 <- tsclean(data$tdsma7)
-data$tdsma30 <- tsclean(data$tdsma30)
-data$tdsma100 <- tsclean(data$tdsma100)
-data$tempriverma7 <- tsclean(data$tempriverma7)
-data$tempriverma30 <- tsclean(data$tempriverma30)
-data$tempairma7 <- tsclean(data$tempairma7)
-data$tempairma30 <- tsclean(data$tempairma30)
+# DECOMPOSE (using forecast package). Don't forget to install and load forecast package
+## ON TDS USING STL FUNCTION, ADDITIVE AND MULTIPLICATIVE
+### location: CP 
+tds_cp <- ts(data_cp$ts_tds, frequency=100) 
+decompose_tds_cp_stl <- stl(tds_cp, s.window="periodic")
+plot(decompose_tds_cp_stl, main = "Decomposition of time series CP")
 
-# PLOTTING MA RESULTS TDS USING BASE PLOT OK
-date <- as.Date(data$DATE)
+decompose_tds_cp_mult <- decompose(tds_cp, "mult")
+plot(as.ts(tds_cp))
+plot(as.ts(decompose_tds_cp_mult$seasonal))
+plot(as.ts(decompose_tds_cp_mult$trend))
+plot(as.ts(decompose_tds_cp_mult$random))
 
-plot(data$ts.tds, col="grey", 
-     main = "Plot data TDS dan hasil moving average pada berbagai orde",
-     ylab = "TDS (ppm)")
-lines(data$tdsma7, col="red")
-lines(data$tdsma30, col="blue")
-lines(data$tdsma100, col="black", lwd=2)
-legend("topleft", legend=c("data", "MA orde 7", "MA orde 30", "MA orde 100"),
-       col=c("grey", "red", "blue", "black"), lty=1, cex=0.6)
+decompose_tds_cp_add <- decompose(tds_cp, "additive")
+plot(as.ts(tds_cp))
+plot(as.ts(decompose_tds_cp_add$seasonal))
+plot(as.ts(decompose_tds_cp_add$trend))
+plot(as.ts(decompose_tds_cp_add$random))
 
 
-## CREATING THE SAME MA PLOT USING GGPLOT2
-ggplot(data=data, aes(x = data$combine)) +
-  geom_line(aes(y = data$ts.tds, colour="data")) +
-  geom_line(aes(y = data$tdsma7, colour="MA orde 7")) +
-  geom_line(aes(y = data$tdsma30, colour="MA orde 30")) +
-  geom_line(aes(y = data$tdsma100, colour="MA orde 100")) +
-  labs(title = "Plot data TDS dan hasil moving average pada berbagai orde",
-       x = "Bulan", y = "TDS data (ppm)",
-       subtitle = "Maret-November 2017", 
-       ylim(60, 70)) +
-  theme_minimal() +
-  scale_color_manual(values = c("grey", "red", "blue", "black"))
+### location: PHI
+tds_phi <- ts(data_phi$ts_tds, frequency=100) 
+decompose_tds_phi <- stl(tds_phi, s.window="periodic")
+plot(decompose_tds_phi, main = "Decomposition of time series PHI")
 
-# DECOMPOSE
-## ON TDS USING STL FUNCTION (WE USE PREVIOUS MA OBJECT)
-tds_ma <- ts(data$tdsma7, frequency=100) #OK. WE HAVE REMOVED THE NAS USING TSCLEAN FUNCTION
-decompose_tds_stl <- stl(tds_ma, s.window="periodic")
-plot(decompose_tds_stl, main = "Decomposition of STL time series")
+decompose_tds_phi_mult <- decompose(tds_phi, "mult")
+plot(as.ts(tds_phi))
+plot(as.ts(decompose_tds_phi_mult$seasonal))
+plot(as.ts(decompose_tds_phi_mult$trend))
+plot(as.ts(decompose_tds_phi_mult$random))
 
-## ON TDS USING DECOMPOSE FUNCTION ADDITIVE
-decompose_tds_add <- decompose(tds_ma, "additive")
-plot(as.ts(decompose_tds_add$seasonal))
-plot(as.ts(decompose_tds_add$trend))
-plot(as.ts(decompose_tds_add$random))
-plot(decompose_tds_add)
+decompose_tds_phi_add <- decompose(tds_phi, "additive")
+plot(as.ts(tds_phi))
+plot(as.ts(decompose_tds_phi_add$seasonal))
+plot(as.ts(decompose_tds_phi_add$trend))
+plot(as.ts(decompose_tds_phi_add$random))
 
-dev.off()
+### location: GRP
+tds_grp <- ts(data_grpts_tds, frequency=100) 
+decompose_tds_grp <- stl(tds_grp, s.window="periodic")
+plot(decompose_tds_grp, main = "Decomposition of time series GRP")
 
-decompose_tds_add$seasona <- tsclean(decompose_tds_add$seasona)
-decompose_tds_add$trend <- tsclean(decompose_tds_add$trend)
-decompose_tds_add$random <- tsclean(decompose_tds_add$random)
+decompose_tds_grp_mult <- decompose(tds_grp, "mult")
+plot(as.ts(tds_grp))
+plot(as.ts(decompose_tds_grp_mult$seasonal))
+plot(as.ts(decompose_tds_grp_mult$trend))
+plot(as.ts(decompose_tds_grp_mult$random))
 
-p1 <- ggplot(data=data, aes(x = data$combine)) +
-  geom_line(aes(y = data$ts.tds))+
-  xlab('month') + ylab('seasonal')
+decompose_tds_grp_add <- decompose(tds_grp, "additive")
+plot(as.ts(tds_grp))
+plot(as.ts(decompose_tds_grp_add$seasonal))
+plot(as.ts(decompose_tds_grp_add$trend))
+plot(as.ts(decompose_tds_grp_add$random))
 
-p2 <- ggplot(data=data, aes(x = data$combine)) +
-  geom_line(aes(y = decompose_tds_add$seasonal))+
-  xlab('month') + ylab('tds data')
-            
-p3 <- ggplot(data=data, aes(x = data$combine)) +
-  geom_line(aes(y = decompose_tds_add$trend))+
-  xlab('month') + ylab('trend')
+# TESTING TStools package
+devtools::install_github("trnnick/TStools")
+library('TStools')
+devtools::install_github("robjhyndman/forecast")
+library('forecast')
+source("https://github.com/trnnick/TStools/blob/master/R/cmav.R")
 
-p4 <- ggplot(data=data, aes(x = data$combine)) +
-  geom_line(aes(y = decompose_tds_add$random))+
-  xlab('month') + ylab('random/noise')
+## Center moving average (cma from tstools pkg)
+cmav(tds_cp, outplot=1)
+cmav(tds_phi, outplot=1)
+cmav(tds_grp, outplot=1)
 
-grid.arrange(p1,p2,p3,p4,ncol=1)
+seasplot(tds_cp, outplot = 4)
+seasplot(tds_phi, outplot = 4)
+seasplot(tds_grp, outplot = 4)
 
-## ON TDS USING DECOMPOSE FUNCTION MULTIPLICATIVE OK
-decompose_tds_mult <- decompose(tds_ma, "mult")
-decompose_tds_add <- decompose(tds_ma, "additive")
-plot(as.ts(decompose_tds_mult$seasonal))
-plot(as.ts(decompose_tds_mult$trend))
+decomp(tds_cp,outplot=1)
+decomp(tds_cp, outplot=1, type="pure.seasonal", h=360)
+plot(stl(tds_cp, s.window=360))
+acf(tds_cp,lag.max=36)
+pacf(tds_cp,lag.max=36)
 
-### evaluating multiplicative vs additive OK
-par(mfrow=c(2,1))
-plot(as.ts(decompose_tds_mult$random))
-plot(as.ts(decompose_tds_add$random))
 
-## results: we don't see any difference between decompose additive vs multiplicative OK
 
-tds_ma <- ts(na.omit(data$tdsma30), frequency=30)
-decomp <- stl(tds_ma, s.window="periodic")
-deseasonal <- seasadj(decomp)
-plot(decomp)
+
+###################################
+###################################
+###################################
+###################################
+
+# DECOMPOSE TEMPERATURE (AIR AND RIVER) DATA 
 
 ## TEMPRIVER (tidak digunakan pasti seasonal)
 ### orde 100
@@ -302,5 +331,4 @@ plot(as.ts(decompose_tds$random))
 plot(decompose_tds)
 
 # end testing forecast
-
 
