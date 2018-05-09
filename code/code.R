@@ -39,54 +39,92 @@ data_grp<-read.csv('data_grp.csv')
 # CONVERT TO TIME SERIES OBJECT -- OK
 
 ## convert date and time as time series then put them in one column
-data$combine <- as.POSIXct(paste(data$DATE, data$TIME_WIB), format="%Y-%m-%d %H:%M") 
-data$combine
+date.time <- as.POSIXct(paste(data$DATE, data$TIME_WIB), format="%Y-%m-%d %H:%M") 
+date.time
 
 ## convert tds data as time series object
-data_cp$ts_tds <- ts(data_cp$TDS_PPM) # converting 
+ts.tds.cp <- ts(data_cp$TDS_PPM) # converting 
 #number to time series class
-data_phi$ts_tds <- ts(data_phi$TDS_PPM) # converting 
-data_grp$ts_tds <- ts(data_grp$TDS_PPM) # converting 
-class(data_cp$ts_tds)  # checking time series class
+ts.tds.phi <- ts(data_phi$TDS_PPM) # converting 
+ts.tds.grp <- ts(data_grp$TDS_PPM) # converting 
+class(ts.tds.cp)  # checking time series class
 
 
 ## convert temp river and temp air data as time series object
-data_cp$ts.tempriver <- ts(data_cp$TEMP_RIVER_C)
-data_cp$ts.tempair <- ts(data_cp$TEMP_AIR_C)
-data_phi$ts.tempriver <- ts(data_phi$TEMP_RIVER_C)
-data_phi$ts.tempair <- ts(data_phi$TEMP_AIR_C)
-data_grp$ts.tempriver <- ts(data_grp$TEMP_RIVER_C)
-data_grp$ts.tempair <- ts(data_grp$TEMP_AIR_C)
+ts.tempriver.cp <- ts(data_cp$TEMP_RIVER_C)
+ts.tempair.cp <- ts(data_cp$TEMP_AIR_C)
+ts.tempriver.phi <- ts(data_phi$TEMP_RIVER_C)
+ts.tempair.phi <- ts(data_phi$TEMP_AIR_C)
+ts.tempriver.grp <- ts(data_grp$TEMP_RIVER_C)
+ts.tempair.grp <- ts(data_grp$TEMP_AIR_C)
 
 ## plot histogram -- OK
-ggplot(data=data_cp, aes(TEMP_AIR_C)) +
+ggplot(data=data_cp, aes(ts.tempair.cp)) +
   geom_histogram(fill="blue") +
-  geom_histogram(aes(TEMP_RIVER_C), fill="red") +
-  labs(title = "Histogram temperatur udara (biru) vs air sungai (merah) Curug Panganten, Bandung",
+  geom_histogram(aes(ts.tempriver.cp), fill="red") +
+  labs(title = "Histogram temperatur udara (biru) vs air sungai (merah) CP",
+       subtitle = "Maret-November 2017",
+       x = "Temperatur (oC)")
+
+ggplot(data=data_phi, aes(ts.tempair.phi)) +
+  geom_histogram(fill="blue") +
+  geom_histogram(aes(ts.tempriver.phi), fill="red") +
+  labs(title = "Histogram temperatur udara (biru) vs air sungai (merah) PHI",
+       subtitle = "Maret-November 2017",
+       x = "Temperatur (oC)")
+
+ggplot(data=data_phi, aes(ts.tempair.grp)) +
+  geom_histogram(fill="blue") +
+  geom_histogram(aes(ts.tempriver.grp), fill="red") +
+  labs(title = "Histogram temperatur udara (biru) vs air sungai (merah) GRP",
        subtitle = "Maret-November 2017",
        x = "Temperatur (oC)")
 
 ## plot histogram TDS ts -- OK
-ggplot(data=data_cp, aes(TDS_PPM)) +
-  geom_histogram(fill="blue") +
-  labs(title = "Histogram TDS Air Sungai Curug Panganten, Bandung",
+ggplot(data=data_cp) +
+  geom_histogram(aes(ts.tds.cp), fill="red", alpha = 0.8) +
+  geom_histogram(aes(ts.tds.grp), fill="blue", alpha = 0.8) +
+  geom_histogram(aes(ts.tds.phi), fill="green", alpha = 0.5) +
+  labs(title = "Histogram TDS Air Sungai: CP (merah), PHI (hijau), GRP (biru)",
        subtitle = "Maret-November 2017",
        x = "TDS (ppm)")
 
-## plot histogram temp river vs air -- OK
-ggplot(data=data_cp, aes(x = data$combine)) +
-  geom_line(aes(y = ts.tempriver), col="red") +
-  geom_line(aes(y = ts.tempair), col="blue") +
-  labs(title = "Temp air sungai dan temp udara Curug Panganten, Bandung",
-       subtitle = "Maret-November 2017",
-       x = "Bulan", y = "Temperatur (derajat C)") + theme(legend.position="bottom")
+## plot temp river vs air -- OK
+temp1 <- ggplot(data=data_cp, aes(x = date.time)) +
+  geom_line(aes(y = ts.tempriver.cp), col="red") +
+  geom_line(aes(y = ts.tempair.cp), col="blue") + ylim(15, 40) +
+  labs(title = "Lokasi: CP", x = "Bulan", y = "Temp udara (biru), temp air (merah) (dC)")
 
-## plot temp air vs river ts -- OK
-ggplot(data=data_cp, aes(x = ts.tempriver, y= ts.tempair)) +
-  geom_point() +
-  labs(title = "Temp air sungai vs temp udara Curug Panganten, Bandung",
-       subtitle = "Maret-November 2017",
-       x = "Temperatur Air Sungai (oC)", y = "Temperatur Udara (oC)") 
+temp2 <- ggplot(data=data_grp, aes(x = date.time)) +
+  geom_line(aes(y = ts.tempriver.grp), col="red") +
+  geom_line(aes(y = ts.tempair.grp), col="blue") + ylim(15, 40) +
+  labs(title = "Lokasi: PHI", x = "Bulan", y = "Temp udara (biru), temp air (merah) (dC)")
+
+temp3 <- ggplot(data=data_grp, aes(x = date.time)) +
+  geom_line(aes(y = ts.tempriver.grp), col="red") +
+  geom_line(aes(y = ts.tempair.grp), col="blue") + ylim(15, 40) +
+  labs(title = "Lokasi: GRP", x = "Bulan", y = "Temp udara (biru), temp air (merah) (dC)")
+
+grid.arrange(temp1,temp2,temp3, ncol=1)
+
+tds1 <- ggplot(data=data_cp, aes(x = date.time)) +
+  geom_line(aes(y = ts.tempriver.cp), col="red", 
+            alpha=0.7) +  
+  ylim(15, 30) +
+  labs(x = "Bulan", 
+       y = "Temp CP (dC)")
+
+tds2 <- ggplot(data=data_phi, aes(x = date.time)) +
+  geom_line(aes(y = ts.tempriver.phi), col="green", alpha=0.7) + 
+  ylim(15, 30) +
+  labs(y = "Temp PHI (dC)", x = "Bulan")
+
+tds3 <- ggplot(data=data_grp, aes(x = date.time)) +
+  geom_line(aes(y = ts.tempriver.grp), col="blue", alpha=0.7) +
+  ylim(15, 30)  +
+  labs(y = "TDS GRP (dC)", x = "Bulan")
+
+grid.arrange(tds1,tds2,tds3, ncol=1)
 
 ## plot TDS as is
 
